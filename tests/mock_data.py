@@ -17,7 +17,7 @@ class BadResponse(Response):
     ok = False
     status_code = 404
 
-    def __init__(self, url):
+    def __init__(self, url, *args, **kwargs):
         pass
 
 
@@ -25,7 +25,7 @@ class GoodResponse(Response):
 
     _PAGE_LENGTH = 3
 
-    def __init__(self, url):
+    def __init__(self, url, *args, **kwargs):
         pieces = url.split('page=')
         if len(pieces) > 1:
             self.page = int(pieces[1])

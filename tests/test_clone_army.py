@@ -7,17 +7,16 @@ test_clone_army
 Tests for `clone_army` module.
 """
 
-from . import mock_data
-
 import os.path
 from unittest import mock
-import pytest
 
+import pytest
 import requests
 from click.testing import CliRunner
 
-from clone_army import clone_army
-from clone_army import cli
+from clone_army import cli, clone_army
+
+from . import mock_data
 
 
 class TestCli(object):
@@ -40,7 +39,9 @@ class TestCli(object):
     def test_no_account_name_ok_when_existing_only(self):
         runner = CliRunner()
         with runner.isolated_filesystem():
-            result = runner.invoke(cli.main, ['--existing-only', ])
+            result = runner.invoke(cli.main, [
+                '--existing-only',
+            ])
             assert not result.exception
 
     @pytest.mark.skip(reason="need to mock out despite runner.invoke")
@@ -93,16 +94,20 @@ class TestCloning(object):
         repos = clone_army.repositories('18F')
         repo1 = clone_army.Repository(repos.__next__())
         repo1.synch()
-        mocked_run.assert_called_with(['git', 'clone', repo1.clone_url])
+        mocked_run.assert_called_with([
+            'git', 'clone',
+            'https://None:None@github.com/18F/14c-prototype.git'
+        ])
 
     def test_args_passed_when_cloning(self, mocked_get, mocked_run):
         repos = clone_army.repositories('18F')
         repo1 = clone_army.Repository(repos.__next__())
         assert not os.path.exists(repo1.name)
-        repo1.synch('--depth', '1')
-        mocked_run.assert_called_with(
-            ['git', 'clone', '--depth', '1',
-             'https://github.com/18F/14c-prototype.git'])
+        repo1.synch((None, None), '--depth', '1')
+        mocked_run.assert_called_with([
+            'git', 'clone', '--depth', '1',
+            'https://None:None@github.com/18F/14c-prototype.git'
+        ])
 
     @mock.patch('os.path.exists', return_value=True)
     def test_pulls_when_dir_exists(self, mocked_exists, mocked_get,
@@ -122,9 +127,9 @@ class TestCloning(object):
     def test_only_updating_present_repos(self, mocked_isdir, mocked_listdir,
                                          mocked_get, mocked_run):
         expected_calls = [
-            mock.call(['git', 'pull'], cwd='dir1'), mock.call(
-                ['git', 'pull'], cwd='dir2'), mock.call(
-                    ['git', 'pull'], cwd='dir3')
+            mock.call(['git', 'pull'], cwd='dir1'),
+            mock.call(['git', 'pull'], cwd='dir2'),
+            mock.call(['git', 'pull'], cwd='dir3')
         ]
         clone_army.Repository.synch_present()
         mocked_run.assert_has_calls(expected_calls)
@@ -135,8 +140,7 @@ class TestCloning(object):
                                      mocked_get, mocked_run):
         expected_calls = [
             mock.call(['git', 'pull'], cwd='bar2'),
-            mock.call(
-                ['git', 'pull'], cwd='bar4'),
+            mock.call(['git', 'pull'], cwd='bar4'),
         ]
         clone_army.Repository.synch_present(filter='bar')
         mocked_run.assert_has_calls(expected_calls)
