@@ -19,7 +19,7 @@ test_requirements = [
 
 setup(
     name='clone_army',
-    version='0.1.0',
+    version='0.2.0',
     description="Locally clone or synch all a GitHub account's repos",
     long_description=readme + '\n\n' + history,
     author="18F",

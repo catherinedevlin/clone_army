@@ -68,6 +68,9 @@ are
 - If you had run `clone-army` with a filter, you won't need to re-use that
   filter to avoid cloning the rest of the repositories
 
+To discover and clone private repos, call with `--login (your github username)`; you
+will be prompted for your password.
+
 Comparable projects
 -------------------
 

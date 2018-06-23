@@ -109,6 +109,16 @@ class TestCloning(object):
             'https://None:None@github.com/18F/14c-prototype.git'
         ])
 
+    def test_auth_info_passed_when_provided(self, mocked_get, mocked_run):
+        repos = clone_army.repositories('18F')
+        repo1 = clone_army.Repository(repos.__next__())
+        assert not os.path.exists(repo1.name)
+        repo1.synch(('myusername', 'mypassword'), '--depth', '1')
+        mocked_run.assert_called_with([
+            'git', 'clone', '--depth', '1',
+            'https://myusername:mypassword@github.com/18F/14c-prototype.git'
+        ])
+
     @mock.patch('os.path.exists', return_value=True)
     def test_pulls_when_dir_exists(self, mocked_exists, mocked_get,
                                    mocked_run):
